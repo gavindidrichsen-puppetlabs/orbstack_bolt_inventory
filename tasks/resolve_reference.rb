@@ -29,6 +29,20 @@ targets:
   uri: compiler01@orb
 - name: compiler02
   uri: compiler02@orb
+groups:
+- name: agent
+  facts:
+    role: agent
+  targets:
+  - agent01
+  - agent02
+  - agent03
+- name: compiler
+  facts:
+    role: compiler
+  targets:
+  - compiler01
+  - compiler02
 """
 
 # convert YAML to a ruby hash
