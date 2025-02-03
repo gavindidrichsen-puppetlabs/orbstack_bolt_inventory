@@ -1,21 +1,3 @@
-#!/usr/bin/env ruby
-# frozen_string_literal: true
-
-require 'json'
-require 'yaml'
-require 'optparse'
-
-# Parse command line options
-options = {}
-OptionParser.new do |opts|
-  opts.banner = "Usage: resolve_reference.rb [options]"
-  opts.on('-y', '--yaml', 'Output in YAML format') do |y|
-    options[:yaml] = y
-  end
-end.parse!
-
-# Load YAML from a file or string
-yaml_data = """
 ---
 config:
   transport: ssh
@@ -53,15 +35,3 @@ groups:
   targets:
   - compiler01
   - compiler02
-"""
-
-# convert YAML to a ruby hash
-hash = YAML.load(yaml_data)
-
-result = { 'value' => hash }
-
-if options[:yaml]
-  puts hash.to_yaml
-else
-  puts result.to_json
-end
