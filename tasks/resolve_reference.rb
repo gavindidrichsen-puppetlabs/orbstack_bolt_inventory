@@ -14,7 +14,7 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-# Load YAML from a file or string
+# create a valid yaml bolt inventory
 yaml_data = """
 ---
 config:
@@ -57,7 +57,6 @@ groups:
 
 # convert YAML to a ruby hash
 hash = YAML.load(yaml_data)
-
 result = { 'value' => hash }
 
 if options[:yaml]
