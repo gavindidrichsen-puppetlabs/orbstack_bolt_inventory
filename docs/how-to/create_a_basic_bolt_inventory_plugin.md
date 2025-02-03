@@ -24,16 +24,9 @@ EOL
 
 # verify bolt is working as expected
 bolt command run "hostname" --targets=localhost
-
-# verify bolt inventory works fine against expected orbstack VMs
-cp inventory.yaml.orbstack > inventory.yaml
-bolt inventory show
-bolt command run "hostname" --targets=all
-
-rm -f inventory.yaml
 ```
 
-Now use the plugin:
+Now create an inventory file pointing to your (non-existant) plugin:
 
 ```bash
 # create an inventory.yaml expecting a the _plugin: basic_plugin
@@ -128,5 +121,92 @@ bolt command run "hostname" --targets=all
 ### Basic Use Output
 
 ```bash
+  dump git:(development) mkdir my_plugin
+cd my_plugin
 
+➜  my_plugin git:(development) cat << 'EOL' > bolt-project.yaml
+---
+name: usage
+modules: []
+EOL
+
+
+➜  my_plugin git:(development) bolt command run "hostname" --targets=localhost
+Started on localhost...
+Finished on localhost:
+  EMEA-Didrichsen
+Successful on 1 target: localhost
+Ran on 1 target in 0.02 sec
+
+
+➜  my_plugin git:(development) cat << 'EOL' > inventory.yaml
+version: 2
+_plugin: basic_plugin
+EOL
+
+
+➜  my_plugin git:(development) bolt inventory show
+Unknown plugin: 'basic_plugin'
+
+
+
+➜  my_plugin git:(development) mkdir -p modules/basic_plugin
+➜  my_plugin git:(development) cat << 'EOL' > modules/basic_plugin/bolt_plugin.json
+{
+  "name": "basic_plugin",
+  "version": "0.1.0",
+  "description": "A Bolt dynamic inventory plugin for Orbstack VMs",
+  "tasks": {
+    "resolve_reference": "tasks/resolve_reference.rb"
+  }
+}
+EOL
+➜  my_plugin git:(development) mkdir -p modules/basic_plugin/tasks
+
+
+➜  my_plugin git:(development) cat << 'EOL' > modules/basic_plugin/tasks/resolve_reference.json
+{
+  "description": "Resolve targets for Orbstack inventory",
+  "input_method": "stdin",
+  "parameters": {}
+}
+EOL
+...
+...
+➜  my_plugin git:(development) bolt inventory show
+Targets
+  agent01
+  agent02
+  agent03
+  compiler01
+  compiler02
+
+Inventory source
+  /Users/gavin.didrichsen/@REFERENCES/github/app/development/tools/puppet/repositories/gavindidrichsen/control-repo/site-modules/bigbird/dump/my_plugin/inventory.yaml
+
+Target count
+  5 total, 5 from inventory, 0 adhoc
+
+Additional information
+  Use the '--targets', '--query', or '--rerun' option to view specific targets
+  Use the '--detail' option to view target configuration and data
+➜  my_plugin git:(development) bolt command run "hostname" --targets=all
+Started on agent01...
+Started on agent03...
+Started on compiler02...
+Started on compiler01...
+Started on agent02...
+Finished on agent02:
+  agent02
+Finished on compiler01:
+  compiler01
+Finished on agent03:
+  agent03
+Finished on compiler02:
+  compiler02
+Finished on agent01:
+  agent01
+Successful on 5 targets: agent01,agent02,agent03,compiler01,compiler02
+Ran on 5 targets in 11.03 sec
+➜  my_plugin git:(development) 
 ```
