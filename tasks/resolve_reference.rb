@@ -31,18 +31,9 @@ targets:
   uri: compiler02@orb
 """
 
-# Convert YAML to a Ruby hash
+# convert YAML to a ruby hash
 hash = YAML.load(yaml_data)
+
+# 
 result = { 'value' => hash }
 puts result.to_json
-
-exit 0
-# Generate the inventory and output the result
-begin
-  # Wrap the inventory result in a 'value' key as expected by Bolt
-  result = { 'value' => hash }
-  puts result.to_json
-rescue StandardError => e
-  warn({ _error: { msg: e.message, kind: 'bolt/plugin-error' } }.to_json)
-  exit 1
-end
